@@ -1,26 +1,47 @@
-# CDCgov GitHub Organization Open Source Project Template
+# Estimating the Direct Impact of Influenza Vaccination and Vaccine-Averted Illnesses Using an Extended Static Compartmental Model
 
-**Template for clearance: This project serves as a template to aid projects in starting up and moving through clearance procedures. To start, create a new repository and implement the required [open practices](open_practices.md), train on and agree to adhere to the organization's [rules of behavior](rules_of_behavior.md), and [send a request through the create repo form](https://forms.office.com/Pages/ResponsePage.aspx?id=aQjnnNtg_USr6NJ2cHf8j44WSiOI6uNOvdWse4I-C2NUNk43NzMwODJTRzA4NFpCUk1RRU83RTFNVi4u) using language from this template as a Guide.**
+[![License](https://img.shields.io/badge/license-Apache_2.0_license-brightgreen)](LICENSE)
 
-**General disclaimer** This repository was created for use by CDC programs to collaborate on public health related projects in support of the [CDC mission](https://www.cdc.gov/about/cdc/#cdc_about_cio_mission-our-mission).  GitHub is not hosted by the CDC, but is a third party website used by CDC and its partners to share information and collaborate on software. CDC use of GitHub does not imply an endorsement of any one particular service, product, or enterprise. 
-
-## Access Request, Repo Creation Request
-
-* [CDC GitHub Open Project Request Form](https://forms.office.com/Pages/ResponsePage.aspx?id=aQjnnNtg_USr6NJ2cHf8j44WSiOI6uNOvdWse4I-C2NUNk43NzMwODJTRzA4NFpCUk1RRU83RTFNVi4u) _[Requires a CDC Office365 login, if you do not have a CDC Office365 please ask a friend who does to submit the request on your behalf. If you're looking for access to the CDCEnt private organization, please use the [GitHub Enterprise Cloud Access Request form](https://forms.office.com/Pages/ResponsePage.aspx?id=aQjnnNtg_USr6NJ2cHf8j44WSiOI6uNOvdWse4I-C2NUQjVJVDlKS1c0SlhQSUxLNVBaOEZCNUczVS4u).]_
-
-## Related documents
-
-* [Open Practices](open_practices.md)
-* [Rules of Behavior](rules_of_behavior.md)
-* [Thanks and Acknowledgements](thanks.md)
-* [Disclaimer](DISCLAIMER.md)
-* [Contribution Notice](CONTRIBUTING.md)
-* [Code of Conduct](code-of-conduct.md)
+> ⚠️ **Notice:** As a first step, this document is under governance review. When the review completes as appropriate per local and agency processes, the project team will be allowed to remove this notice. This material is draft.
 
 ## Overview
 
-Describe the purpose of your project. Add additional sections as necessary to help collaborators and potential collaborators understand and use your project.
-  
+This repository contains a Microsoft Excel tool with supporting R scripts to estimate the direct impact of influenza vaccination. The tool is an extension of the static compartmental model originally developed by [Kostova et al.](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0066312), and builds on previous work documented in the background chapter of the [WHO Burden of Disease manual](https://iris.who.int/items/2127667f-e01c-4b69-b902-cc14db08f297) and [earlier versions](https://github.com/ChiedzaWHO/Influenza-Burden-Burden-Averted) of the tool.
+
+A manuscript describing this extended tool is currently under development. This page will be updated with the citation once it is available.
+
+### Running the tool
+
+1. Download the repository by clicking the green **Code** button and selecting **Download ZIP**. Extract the folder to a location on your machine.
+2. Open `Phase 2 data input tool_final.xlsm`.
+3. On the **Inputs** tab, follow the instructions to enter the required model parameters.
+   - After completing all required inputs, click the **Run model** button.
+   - The results will populate on the **Results** tab.
+   - To generate confidence intervals for the results, the model must be run in R. Before proceeding, save the Excel file (**do not change the file name**) and close it.
+4. Open the R project file `Averted_Illness_PhaseII.Rproj` to launch RStudio.
+5. In RStudio, open `Avert_Illness_Calculation.R` and run the entire script. Results will automatically export to `Phase 2 data input tool_final.xlsm`.
+6. *(Optional)* On the **Scenarios** tab, follow the instructions to input data for modeling different vaccine coverage and deployment scenarios.
+   - After completing all required inputs, click the **Run scenarios** button.
+   - The results will populate on the **Scenario Results** tab.
+
+> **Tip:** Use the **Clear inputs** button at any time to reset inputs.
+
+### Disclaimer
+
+The conclusions, findings, and opinions expressed by authors contributing to this article do not necessarily reflect the official position of the U.S. Department of Health and Human Services, the Public Health Service, the Centers for Disease Control and Prevention, or the authors' affiliated institutions.
+
+### Contact information
+
+**Young Moo (Daniel) Yoo, MSPH**  
+Situational Awareness and Modeling (SAM) Team  
+Global Influenza Branch (GIB)  
+Influenza division (ID)  
+National Center for Immunization and Respiratory Diseases (NCIRD)  
+Centers for Disease Control and Prevention (CDC)  
+
+Work address: 602 Webb Gin House Rd, Lawrenceville, GA 30045  
+Work email: <opp8@cdc.gov>  
+
 ## Public Domain Standard Notice
 This repository constitutes a work of the United States Government and is not
 subject to domestic copyright protection under 17 USC § 105. This repository is in
