@@ -2,8 +2,6 @@
 
 [![License](https://img.shields.io/badge/license-Apache_2.0_license-brightgreen)](LICENSE)
 
-> ⚠️ **Notice:** As a first step, this document is under governance review. When the review completes as appropriate per local and agency processes, the project team will be allowed to remove this notice. This material is draft.
-
 ## Overview
 
 This repository contains a Microsoft Excel tool with supporting R scripts to estimate the direct impact of influenza vaccination. The tool is an extension of the static compartmental model originally developed by [Kostova et al.](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0066312), and builds on previous work documented in the background chapter of the [WHO Burden of Disease manual](https://iris.who.int/items/2127667f-e01c-4b69-b902-cc14db08f297) and [earlier versions](https://github.com/ChiedzaWHO/Influenza-Burden-Burden-Averted) of the tool.
@@ -35,7 +33,7 @@ The conclusions, findings, and opinions expressed by authors contributing to thi
 **Young Moo (Daniel) Yoo, MSPH**  
 Situational Awareness and Modeling (SAM) Team  
 Global Influenza Branch (GIB)  
-Influenza division (ID)  
+Influenza Division (ID)  
 National Center for Immunization and Respiratory Diseases (NCIRD)  
 Centers for Disease Control and Prevention (CDC)  
 
@@ -71,8 +69,8 @@ The source code forked from other open source projects will inherit its license.
 ## Privacy Standard Notice
 This repository contains only non-sensitive, publicly available data and
 information. All material and community participation is covered by the
-[Disclaimer](DISCLAIMER.md)
-and [Code of Conduct](code-of-conduct.md).
+[Disclaimer](https://github.com/CDCgov/template/blob/main/DISCLAIMER.md)
+and [Code of Conduct](https://github.com/CDCgov/template/blob/main/code-of-conduct.md).
 For more information about CDC's privacy policy, please visit [http://www.cdc.gov/other/privacy.html](https://www.cdc.gov/other/privacy.html).
 
 ## Contributing Standard Notice
