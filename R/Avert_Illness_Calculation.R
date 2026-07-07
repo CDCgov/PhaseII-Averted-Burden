@@ -26,7 +26,7 @@ start.time <- Sys.time()
 nsim <- 5000
 
 # data with inputs 
-data_import <- read_excel("Phase 2 data input tool_final.xlsm",  
+data_import <- read_excel("../Phase 2 data input tool_final.xlsm",  
                           sheet = "Export") %>% 
   filter(!is.na(mnth_hosp)) %>% 
   mutate(month = row_number()) %>% 
@@ -465,11 +465,11 @@ result_final <- result %>%
   filter(year != 0)
 
 # export results and scenarios to input tool
-wb <- loadWorkbook("Phase 2 data input tool_final.xlsm")
+wb <- loadWorkbook("../Phase 2 data input tool_final.xlsm")
 if (!"R Output" %in% names(wb)) {
   addWorksheet(wb, sheetName = "R Output")
 }
 writeData(wb, sheet = "R Output", x = result_final, withFilter = TRUE)
 setRowHeights(wb, sheet = "Inputs", rows = 20:33, heights = 0)
-saveWorkbook(wb, file = "Phase 2 data input tool_final.xlsm", overwrite = TRUE)
+saveWorkbook(wb, file = "../Phase 2 data input tool_final.xlsm", overwrite = TRUE)
 
