@@ -175,7 +175,9 @@ dat_sim <- temp_sim %>%
     sim_mnthvc = adj_sim_vc * propvax
   ) %>% 
   group_by(sim_index, year) %>%
-  mutate(starting_ve_ill = waning_ve(adj_sim_ve_ill[1])[[1]]) %>%
+  mutate(starting_ve_ill = if_else(VE_assumption == "Waning VE, cubic function (default)",
+                                   waning_ve(adj_sim_ve_ill[1])[[1]],
+                                   adj_sim_ve_ill*100)) %>%
   ungroup() %>% 
   mutate(
     effvax_pop = target_pop_size * sim_mnthvc * starting_ve_ill/100,  
@@ -249,10 +251,17 @@ run_param <- data_import %>%
            adj_sim_ve_hosp = adjve_hosp)
   
 # Apply the waning_ve function to dat_sim$adj_sim_ve_ill
-run_param$starting_ve_ill <- sapply(run_param$adj_sim_ve_ill, function(report_ve) {
-  starting_ve_ill <- waning_ve(report_ve)[[1]]  
-  return(starting_ve_ill)
-})
+run_param$starting_ve_ill <- mapply(
+  function(report_ve, assumption) {
+    if (assumption == "Waning VE, cubic function (default)") {
+      waning_ve(report_ve)[[1]]
+    } else {
+      report_ve*100
+    }
+  },
+  run_param$adj_sim_ve_ill,
+  run_param$VE_assumption
+)
   
 # effectively/not effectively population at each month
 run_param <- run_param %>% 
@@ -341,8 +350,41 @@ output <- avert %>%
          nnv_death = vax_sum/avert_death_sum,
          nnv_overall = vax_sum/(avert_hosp_sum + avert_nohosp_sum) )
 
+output_overall <- avert %>% 
+  filter(year != 0) %>% 
+  group_by(sim_index) %>% 
+  summarise(absence_hosp_sum = sum(absence_hosp, na.rm = TRUE),
+            presence_hosp_sum = sum(presence_hosp, na.rm = TRUE),
+            avert_hosp_sum = sum(avert_hosp, na.rm = TRUE),
+            
+            absence_nohosp_sum = sum(absence_nohosp, na.rm = TRUE),
+            presence_nohosp_sum = sum(presence_nohosp, na.rm = TRUE),
+            avert_nohosp_sum = sum(avert_nohosp, na.rm = TRUE),
+            
+            absence_maill_sum = sum(absence_maill, na.rm = TRUE),
+            presence_maill_sum = sum(presence_maill, na.rm = TRUE),
+            avert_maill_sum = sum(avert_maill, na.rm = TRUE),
+            
+            absence_death_sum = sum(absence_death, na.rm = TRUE),
+            presence_death_sum = sum(presence_death, na.rm = TRUE),
+            avert_death_sum = sum(avert_death, na.rm = TRUE),
+            
+            vax_sum = sum(effvax_pop, na.rm = TRUE) + sum(noteff_pop, na.rm = TRUE)) %>% 
+  mutate(pf_hosp = avert_hosp_sum/absence_hosp_sum,
+         pf_nohosp = avert_nohosp_sum/absence_nohosp_sum,
+         pf_maill = avert_maill_sum/absence_maill_sum,
+         pf_death = avert_death_sum/absence_death_sum,
+         pf_overall = (avert_hosp_sum + avert_nohosp_sum)/(absence_hosp_sum + absence_nohosp_sum) ) %>% 
+  mutate(nnv_hosp = vax_sum/avert_hosp_sum,
+         nnv_nohosp = vax_sum/avert_nohosp_sum,
+         nnv_maill = vax_sum/avert_maill_sum,
+         nnv_death = vax_sum/avert_death_sum,
+         nnv_overall = vax_sum/(avert_hosp_sum + avert_nohosp_sum) )
+
 # point estimate with uncertainty 
 result <- output %>% 
+  mutate(year = as.character(year)) %>%
+  bind_rows(output_overall %>% mutate(year = "Overall")) %>%
   group_by(year) %>% 
   summarise(
             #burden in presence of vaccine program
@@ -400,6 +442,14 @@ result <- output %>%
             pf_overall_mean = mean(pf_overall, na.rm = TRUE),
             pf_overall_lcl = quantile(pf_overall, 0.025, na.rm = TRUE),
             pf_overall_ucl = quantile(pf_overall, 0.975, na.rm = TRUE),
+            
+            absence_overall_mean = mean(absence_hosp_sum + absence_nohosp_sum, na.rm = TRUE),
+            absence_overall_lcl = quantile(absence_hosp_sum + absence_nohosp_sum, 0.025, na.rm = TRUE),
+            absence_overall_ucl = quantile(absence_hosp_sum + absence_nohosp_sum, 0.975, na.rm = TRUE),
+            
+            presence_overall_mean = mean(presence_hosp_sum + presence_nohosp_sum, na.rm = TRUE),
+            presence_overall_lcl = quantile(presence_hosp_sum + presence_nohosp_sum, 0.025, na.rm = TRUE),
+            presence_overall_ucl = quantile(presence_hosp_sum + presence_nohosp_sum, 0.975, na.rm = TRUE),
             
             avert_overall_mean = mean(avert_hosp_sum + avert_nohosp_sum, na.rm = TRUE),
             avert_overall_lcl = quantile(avert_hosp_sum + avert_nohosp_sum, 0.025, na.rm = TRUE),
@@ -459,10 +509,50 @@ result_param <- avert_param %>%
          nnv_overall_param = vax_param / (avert_hosp_param + avert_nohosp_param) ) %>% 
   select(-vax_param)
 
+result_param_overall <- avert_param %>% 
+  mutate(year = case_when(month < 13 ~ 0,
+                          month < 25 ~ 1,
+                          month < 37 ~ 2,
+                          month < 49 ~ 3, 
+                          TRUE ~ 4)) %>%
+  filter(year != 0) %>%
+  summarise(absence_hosp_param = sum(absence_hosp, na.rm = TRUE),
+            presence_hosp_param = sum(presence_hosp, na.rm = TRUE),
+            avert_hosp_param = sum(avert_hosp, na.rm = TRUE),
+            
+            absence_nohosp_param = sum(absence_nohosp, na.rm = TRUE),
+            presence_nohosp_param = sum(presence_nohosp, na.rm = TRUE),
+            avert_nohosp_param = sum(avert_nohosp, na.rm = TRUE),
+            
+            absence_maill_param = sum(absence_maill, na.rm = TRUE),
+            presence_maill_param = sum(presence_maill, na.rm = TRUE),
+            avert_maill_param = sum(avert_maill, na.rm = TRUE),
+            
+            absence_death_param = sum(absence_death, na.rm = TRUE),
+            presence_death_param = sum(presence_death, na.rm = TRUE),
+            avert_death_param = sum(avert_death, na.rm = TRUE),
+            
+            vax_param = sum(effvax_pop, na.rm = TRUE) + sum(noteff_pop, na.rm = TRUE)) %>%  
+  mutate(pf_hosp_param = avert_hosp_param/absence_hosp_param,
+         pf_nohosp_param = avert_nohosp_param/absence_nohosp_param,
+         pf_maill_param = avert_maill_param/absence_maill_param,
+         pf_death_param = avert_death_param/absence_death_param,
+         pf_overall_param = (avert_hosp_param + avert_nohosp_param) / (absence_hosp_param + absence_nohosp_param) ) %>%  
+  mutate(nnv_hosp_param = vax_param/avert_hosp_param,
+         nnv_nohosp_param = vax_param/avert_nohosp_param,
+         nnv_maill_param = vax_param/avert_maill_param,
+         nnv_death_param = vax_param/avert_death_param,
+         nnv_overall_param = vax_param / (avert_hosp_param + avert_nohosp_param) ) %>% 
+  select(-vax_param)
+
 result_final <- result %>% 
-  left_join(result_param, 
+  left_join(result_param %>% 
+              mutate(year = as.character(year)) %>%
+              bind_rows(result_param_overall %>% mutate(year = "Overall")), 
             by = "year") %>% 
-  filter(year != 0)
+  filter(year != 0) %>% 
+  mutate(year = factor(year, levels = c("Overall", "1", "2", "3", "4"))) %>%
+  arrange(year)
 
 # export results and scenarios to input tool
 wb <- loadWorkbook("../Phase 2 data input tool_final.xlsm")
@@ -470,6 +560,6 @@ if (!"R Output" %in% names(wb)) {
   addWorksheet(wb, sheetName = "R Output")
 }
 writeData(wb, sheet = "R Output", x = result_final, withFilter = TRUE)
-setRowHeights(wb, sheet = "Inputs", rows = 20:33, heights = 0)
+setRowHeights(wb, sheet = "Inputs", rows = 22:35, heights = 0)
 saveWorkbook(wb, file = "../Phase 2 data input tool_final.xlsm", overwrite = TRUE)
 

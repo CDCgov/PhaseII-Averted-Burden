@@ -45,7 +45,17 @@ calculate_absence <- function(dat) {
   
   # effectively vaccinated 
   hypo_ev_return <- matrix(NA, nrow = time_period, ncol = time_period)
-  ve_value <- sapply(1:time_period, function(d) waning_ve(dat$adj_sim_ve_ill[d])[[3]] / 100)
+  ve_value <- sapply(1:time_period, function(d) {
+    
+    if (dat$VE_assumption[d] == "Waning VE, cubic function (default)") {
+      waning_ve(dat$adj_sim_ve_ill[d])[[3]] / 100
+    } else {
+      temp <- rep(0, time_period)
+      temp[9] <- dat$adj_sim_ve_ill[d]
+      temp
+    }
+  })
+  # ve_value <- sapply(1:time_period, function(d) waning_ve(dat$adj_sim_ve_ill[d])[[3]] / 100)
   for (m in 1:time_period) {
     
     for (i in 1:time_period){
@@ -57,8 +67,28 @@ calculate_absence <- function(dat) {
   }
   
   # Calculate initial infections and track the remaining population for each month
-  waning_ve_ill <- sapply(1:time_period, function(d) waning_ve(dat$adj_sim_ve_ill[d])[[2]] / 100)
-  waning_ve_hosp <- sapply(1:time_period, function(d) waning_ve(dat$adj_sim_ve_hosp[d])[[2]] / 100)
+  waning_ve_ill <- sapply(1:time_period, function(d) {
+    
+    if (dat$VE_assumption[d] == "Waning VE, cubic function (default)") {
+      waning_ve(dat$adj_sim_ve_ill[d])[[2]] / 100
+    } else {
+      temp <- rep(0, time_period)
+      temp[1:8] <- dat$adj_sim_ve_ill[d]
+      temp
+    }
+  })
+  # waning_ve_ill <- sapply(1:time_period, function(d) waning_ve(dat$adj_sim_ve_ill[d])[[2]] / 100)
+  waning_ve_hosp <- sapply(1:time_period, function(d) {
+    
+    if (dat$VE_assumption[d] == "Waning VE, cubic function (default)") {
+      waning_ve(dat$adj_sim_ve_hosp[d])[[2]] / 100
+    } else {
+      temp <- rep(0, time_period)
+      temp[1:8] <- dat$adj_sim_ve_hosp[d]
+      temp
+    }
+  })
+  # waning_ve_hosp <- sapply(1:time_period, function(d) waning_ve(dat$adj_sim_ve_hosp[d])[[2]] / 100)
   residual_protection <- (1 - waning_ve_hosp) / (1 - waning_ve_ill)
   for (m in 2:time_period) {
     
