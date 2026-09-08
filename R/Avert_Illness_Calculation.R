@@ -79,12 +79,15 @@ vaccine_param <- temp_sim %>%
     total_coverage = sum(mnth_coverage),
     .groups = "drop"
   ) %>% 
-  mutate(coverage_se = total_coverage / target_pop_size ) %>%
-  mutate(senorm_cov = rnorm(n(), mean = 0, sd = .75),
-         sim_cov_se = coverage_se * senorm_cov,
-         sim_cov    = total_coverage + sim_cov_se,
-         adj_sim_vc = case_when(sim_cov >= 0 ~ sim_cov,
-                                sim_cov < 0 ~ 0)) 
+  mutate(numbervac = rbinom(n(), target_pop_size, total_coverage))%>%
+  mutate(adj_sim_vc=numbervac/target_pop_size)
+#   mutate(coverage_se = total_coverage / target_pop_size ) %>%
+#   mutate(senorm_cov = rnorm(n(), mean = 0, sd = .75),
+#          sim_cov_se = coverage_se * senorm_cov,
+#          sim_cov    = total_coverage + sim_cov_se,
+#          adj_sim_vc = case_when(sim_cov >= 0 ~ sim_cov,
+#                                 sim_cov < 0 ~ 0)) 
+# ## The above method for coverage estimation has been depricated
 
 # VE sampling
 # assumption: VE hosp must be larger than VE ill and VE must not be negative
@@ -159,15 +162,18 @@ ve_param <- bind_cols(
 set.seed(123)
 dat_sim <- temp_sim %>% 
   left_join(ratio_param %>% 
-              select(sim_index, year, sim_hnhratio, sim_maratio, sim_dhratio),
+              select(sim_index, year, total_hosp, sim_total_hosp, sim_hnhratio, sim_maratio, sim_dhratio),
             by = c("sim_index", "year")) %>% 
   left_join(vaccine_param %>% 
               select(sim_index, year, total_coverage, adj_sim_vc),
             by = c("sim_index", "year")) %>% 
   left_join(ve_param,
             by = c("sim_index", "year")) %>% 
-  # simulated hospiatlization
-  mutate(sim_hosp = rpois(n(), lambda = ceiling(mnth_hosp))) %>% 
+  # simulated hospitalization
+  mutate(propcases = mnth_hosp / total_hosp,
+         sim_hosp = sim_total_hosp * propcases) %>% 
+  # mutate(sim_hosp = rpois(n(), lambda = ceiling(mnth_hosp))) %>% 
+  # ## The above method for drawing monthly hospitalizations has been depricated
   # monthly coverage
   mutate(
     propvax = mnth_coverage / total_coverage,
