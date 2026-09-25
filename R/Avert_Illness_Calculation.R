@@ -41,7 +41,8 @@ time_period <- nrow(data_import)
 # Replicate the dataset nsim times
 temp_sim <- do.call("rbind", replicate(nsim, data_import, simplify = FALSE)) %>% 
   mutate(sim_index = rep(1:nsim, each = time_period),
-         year = (month - 1) %/% 12)
+         year = (month - 1) %/% 12,
+         target_pop_size = as.integer(target_pop_size))
 
 # Ratio parameters
 set.seed(123)
