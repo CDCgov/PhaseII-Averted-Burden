@@ -8,10 +8,54 @@ This repository contains a Microsoft Excel tool with supporting R scripts to est
 
 A manuscript describing this extended tool is currently under development. This page will be updated with the citation once it is available.
 
+### Enabling Solver (required before first use)
+
+This tool uses Excel's **Solver add-in** through VBA. You must enable Solver
+AND add a VBA reference to it before the tool will run. This is a one-time setup.
+
+#### Windows
+
+**Step 1 — Enable the Solver add-in**
+1. Open Excel.
+2. Go to **File → Options → Add-ins**.
+3. At the bottom, next to "Manage: Excel Add-ins", click **Go...**
+4. Check the box for **Solver Add-in**, then click **OK**.
+   (You should now see "Solver" on the **Data** tab in the ribbon.)
+   
+**Step 2 — Add the Solver reference in VBA**
+
+First, show the Developer tab (one-time):
+1. Go to **File → Options → Customize Ribbon**.
+2. On the right side, under "Main Tabs", check the box for **Developer**.
+3. Click **OK**.
+
+Open the VBA editor and add the reference:
+4. Click the **Developer** tab in the ribbon.
+5. Click **Visual Basic** (the first button on the far left).
+6. In the VBA editor menu, go to **Tools → References...**
+7. Scroll down and check the box for **Solver**.
+8. Click **OK**.
+
+#### Mac
+
+**Step 1 — Enable the Solver add-in**
+1. Open Excel.
+2. Go to **Tools → Excel Add-ins** (in the top menu bar).
+3. Check **Solver Add-in**, then click **OK**.
+   (You should now see "Solver" on the **Data** tab.)
+
+**Step 2 — Add the Solver reference in VBA**
+1. Go to **Tools → Macro → Visual Basic Editor**
+2. Once VBA editor is opened, go to **Tools → References...**
+3. Check the box for **Solver** and click **OK**.
+
+You're now ready to run the tool.
+
+
 ### Running the tool
 
 1. Download the repository by clicking the green **Code** button and selecting **Download ZIP**. Extract the folder to a location on your machine.
-2. Open `Phase 2 data input tool_final.xlsm`.
+2. Open `Phase 2 data input tool_final.xlsm`. When opening the tool, click **Enable Content** if prompted.
 3. On the **Inputs** tab, follow the instructions to enter the required model parameters.
    - After completing all required inputs, click the **Run model** button.
    - The results will populate on the **Results** tab.
